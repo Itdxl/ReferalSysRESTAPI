@@ -1,28 +1,28 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, ValidationError
 
-from .models import ReferalCode, ReferalHistory, CustomUser
+from .models import ReferalCode, ReferalHistory, User
 
 
-class CustomUserSerializer(ModelSerializer):
+class UserSerializer(ModelSerializer):
     class Meta:
-        model = CustomUser
-        fields = ['id', 'username', 'email', 'referal_code']  # Включите ваши поля, которые вы хотите сериализовать
+        model = User
+        fields = ['id', 'username', 'email', 'password']
         extra_kwargs = {
-            'password': {'write_only': False},  # Пароль должен возвращаться в ответе
+            'password': {'write_only': True} # Не возвращаем шифр пароля
         }
 
     def create(self, validated_data):
-        user = CustomUser.objects.create_user(**validated_data)
+        user = User.objects.create_user(**validated_data)
         return user
 
 
-class ReferralCodeSerializer(ModelSerializer):
+class ReferalCodeSerializer(ModelSerializer):
     class Meta:
         model = ReferalCode
-        fields = '__all__'
+        fields = ['name', 'expiration_date']
 
 
-class ReferralSerializer(ModelSerializer):
+class ReferalHistorySerializer(ModelSerializer):
     class Meta:
         model = ReferalHistory
-        fields = '__all__'
+        fields = ('id', 'ref_creator', 'ref_user', 'created_at')
